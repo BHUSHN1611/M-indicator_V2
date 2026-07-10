@@ -48,3 +48,28 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+
+## Project Description 
+
+## 🚆 Train Tracker
+
+Train Tracker is a cross-platform mobile application inspired by M-Indicator and Where is My Train. It helps users easily find train information, station details, routes, and nearby stations, with the long-term goal of providing real-time train tracking.
+
+## ✨ Features
+
+Train search
+Station information
+Route details
+Nearby station finder
+Live train tracking (Planned)
+Maps and GPS integration (Planned)
+Offline access (Planned)
+Push notifications (Planned)
+
+## Initial Development Roadmap
+
+phase 1: list train data & design UI
+phase 2: Schedule-Based Tracking
+phase 3: Crowdsourced Tracking (GPS Tracking)
+phase 4: Cell Tower Tracking
