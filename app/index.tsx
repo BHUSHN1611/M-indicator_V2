@@ -1,10 +1,30 @@
-import { Text, View } from "react-native";
+import { StyleSheet,Text, View} from "react-native";
+import { Link } from "expo-router";
 
- 
+const styles = StyleSheet.create({
+  button:{
+    padding:10,
+    borderWidth: 2,          // Line thickness
+    borderColor: '#0020d4',  // Line color
+    borderStyle: 'solid',    // 'solid', 'dashed', or 'dotted'
+    borderRadius: 8,         // Rounded corners
+    backgroundColor: 'blue',
+    color:"white",
+    fontSize:15
+  }
+});
+
 export default function Index() {
   return (
     <View className="flex-1 justify-center items-center">
       <Text className="text-blue-600 text-2xl font-bold">Welcome to M-indicator</Text>
+      <Link style={styles.button}
+      href="/TrainShedulepage">
+        <Text>
+          Virar-to-dhanu Trains
+        </Text>
+      </Link>
+      
     </View>
   );
 }
