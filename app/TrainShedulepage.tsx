@@ -1,9 +1,9 @@
 // TrainList.tsx
-import React from 'react';
-import { ScrollView,View, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import TrainCard from './TrainCard'
-import { Virar_to_dhanu_trains_data } from '../constants/Trainsdata[Virar-Dahanu].js';
+import React from "react";
+import { FlatList, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Virar_to_dhanu_trains_data } from "../constants/Trainsdata[Virar-Dahanu].js";
+import TrainCard from "./TrainCard";
 
 interface TrainData {
   departure_time: string;
@@ -15,30 +15,37 @@ interface TrainData {
 }
 
 const TrainList: React.FC = () => {
-  const navigation = useNavigation();
+  const renderItem = ({ item }: { item: TrainData }) => (
+    <View>
+      <TouchableOpacity
+        onPress={() => {
+          console.log(`button clicked ${item.train_no}`);
+        }}
+      >
+        <TrainCard
+          departure_time={item.departure_time}
+          departure_period={item.departure_period}
+          destination={item.destination}
+          train_type={item.train_type}
+          train_no={item.train_no}
+          route={item.route}
+          platform={4}
+        />
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
-    <ScrollView>
-      {Virar_to_dhanu_trains_data.map((data: TrainData, index: number) => (
-        <View key={index}>
-          <TouchableOpacity
-            onPress={() => {
-              console.log(`button clicked ${data.train_no}`);
-            }}
-          >
-            <TrainCard
-              departure_time={data.departure_time}
-              departure_period={data.departure_period}
-              destination={data.destination}
-              train_type={data.train_type}
-              train_no={data.train_no}
-              route={data.route}
-              platform={4}
-            />
-          </TouchableOpacity>
-        </View>
-      ))}
-    </ScrollView>
+    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+      <FlatList
+        data={Virar_to_dhanu_trains_data}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => `${item.train_no}-${index}`}
+        initialNumToRender={13}
+        maxToRenderPerBatch={5}
+        updateCellsBatchingPeriod={50}
+      />
+    </SafeAreaView>
   );
 };
 
