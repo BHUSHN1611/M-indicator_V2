@@ -1,34 +1,3 @@
-// import { StyleSheet,Text, View} from "react-native";
-// import { Link } from "expo-router";
-
-// const styles = StyleSheet.create({
-//   button:{
-//     padding:10,
-//     borderWidth: 2,          // Line thickness
-//     borderColor: '#0020d4',  // Line color
-//     borderStyle: 'solid',    // 'solid', 'dashed', or 'dotted'
-//     borderRadius: 8,         // Rounded corners
-//     backgroundColor: 'blue',
-//     color:"white",
-//     fontSize:15
-//   }
-// });
-
-// export default function Index() {
-//   return (
-//     <View className="flex-1 justify-center items-center">
-//       <Text className="text-blue-600 text-2xl font-bold">Rail Tracker</Text>
-//       <Link style={styles.button}
-//       href ="/TrainShedulepage">
-//         <Text>
-//           Virar-to-dahanu Trains
-//         </Text>
-//       </Link>
-
-//     </View>
-//   );
-// }
-
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -44,21 +13,12 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { colors } from "@/constants/colors";
 
 // ─── Design tokens ──────────────────────────────────────────────────────────
 // Palette pulled from the signal lamps & brass fittings of a station platform,
 // not a generic "dark mode" default.
-const colors = {
-  navyDeep: "#0B1730", // background base
-  navyPanel: "#132443", // card / panel surface
-  navyPanelAlt: "#1B2E52", // secondary surface (inputs)
-  crimson: "#B4293A", // signal red — primary accent
-  crimsonDeep: "#7E1C2A", // shadow end of red gradient
-  brass: "#D6A75C", // brass rail-fitting gold — secondary accent
-  ivory: "#F3EFE6", // primary text on dark
-  slate: "#8A97B5", // muted secondary text
-  hairline: "rgba(214,167,92,0.18)", // brass hairline divider
-};
+
 
 const RECENT_SEARCHES = [
   { id: "1", from: "Virar", to: "Dahanu", date: "05 Jul 2026" },
@@ -68,12 +28,7 @@ const RECENT_SEARCHES = [
 
 const TABS = [
   { id: "search", label: "Search\nTrain", icon: "train", lib: "MCI" },
-  {
-    id: "schedule",
-    label: "Train\nSchedule",
-    icon: "calendar-outline",
-    lib: "ION",
-  },
+  { id: "schedule",label: "Train\nSchedule", icon: "calendar-outline",lib: "ION",},
   { id: "live", label: "Live\nStation", icon: "timer-outline", lib: "ION" },
   { id: "map", label: "Map", icon: "map-outline", lib: "ION" },
 ];
@@ -120,7 +75,7 @@ export default function RailTrackerHome() {
   const handleTabPress = (tabId: string) => {
     if (tabId === "schedule") {
       setActiveTab("search");
-      router.push("/TrainShedulepage");
+      router.push("/TrainListScreen");
       return;
     }
 

@@ -1,9 +1,10 @@
 // TrainList.tsx
 import React from "react";
-import { FlatList, TouchableOpacity, View } from "react-native";
+import { FlatList, TouchableOpacity, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Virar_to_dhanu_trains_data } from "../constants/Trainsdata[Virar-Dahanu].js";
-import TrainCard from "./TrainCard";
+import { Virar_to_dhanu_trains_data } from "../constants/Trainslistdata[Virar-Dahanu].js";
+import TrainCard from "@/components/TrainCard";
+import { router } from "expo-router";
 
 interface TrainData {
   departure_time: string;
@@ -19,6 +20,16 @@ const TrainList: React.FC = () => {
     <View>
       <TouchableOpacity
         onPress={() => {
+          router.push({
+            pathname:"/TrainRouteScreen",
+            params:{
+              train_no:item.train_no,
+              route : item.route,
+              type:item.train_type,
+              time:item.departure_time
+            }
+          })
+
           console.log(`button clicked ${item.train_no}`);
         }}
       >
@@ -36,7 +47,7 @@ const TrainList: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#171717" }} edges={["top"]}>
       <FlatList
         data={Virar_to_dhanu_trains_data}
         renderItem={renderItem}
@@ -44,6 +55,7 @@ const TrainList: React.FC = () => {
         initialNumToRender={13}
         maxToRenderPerBatch={5}
         updateCellsBatchingPeriod={50}
+        contentContainerStyle={{ paddingVertical: 8 }}
       />
     </SafeAreaView>
   );
