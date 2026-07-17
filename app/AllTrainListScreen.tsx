@@ -1,10 +1,10 @@
-// TrainList.tsx
 import React from "react";
 import { FlatList, TouchableOpacity, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Virar_to_dhanu_trains_data } from "../constants/Trainslistdata[Virar-Dahanu].js";
 import TrainCard from "@/components/TrainCard";
 import { router } from "expo-router";
+import TrainFilter from "@/components/TrainFilter";
 
 interface TrainData {
   departure_time: string;
@@ -29,7 +29,6 @@ const TrainList: React.FC = () => {
               time:item.departure_time
             }
           })
-
           console.log(`button clicked ${item.train_no}`);
         }}
       >
@@ -48,6 +47,7 @@ const TrainList: React.FC = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#171717" }} edges={["top"]}>
+      <TrainFilter borderColorAll="white" borderColorFast="#1e3a5f" borderColorSlow="#1e3a5f"/>
       <FlatList
         data={Virar_to_dhanu_trains_data}
         renderItem={renderItem}

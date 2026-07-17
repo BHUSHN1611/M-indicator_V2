@@ -2,24 +2,36 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
+import { Router } from "expo-router";
 import {
   Animated,
   Pressable,
   ScrollView,
   StatusBar,
-  StyleSheet,
+
   Text,
   TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "@/constants/colors";
+import { styles } from "@/theme_styles";
+import {AllstopsData} from "@/constants/Stationdata[Virar-Dahanu]"
 
 // ─── Design tokens ──────────────────────────────────────────────────────────
 // Palette pulled from the signal lamps & brass fittings of a station platform,
 // not a generic "dark mode" default.
 
+function getTrainList(source:string,destination:string){
+  const AllStops = AllstopsData
 
+  for (let index = 0; index < AllStops.length; index++) {
+    if(AllStops[index]['Station']===source && AllStops[index]["Can_go"].includes(destination)){
+      router.push("/AllTrainListScreen")
+    } 
+  }
+  console.log("Error",source,destination)
+}
 const RECENT_SEARCHES = [
   { id: "1", from: "Virar", to: "Dahanu", date: "05 Jul 2026" },
   { id: "2", from: "Virar", to: "Boisar", date: "04 Jul 2026" },
@@ -75,26 +87,26 @@ export default function RailTrackerHome() {
   const handleTabPress = (tabId: string) => {
     if (tabId === "schedule") {
       setActiveTab("search");
-      router.push("/TrainListScreen");
+      router.push("/AllTrainListScreen");
       return;
     }
 
     setActiveTab(tabId);
   };
 
-  const handleSwap = () => {
-    const nextDirection = swapDirection === 0 ? 1 : 0;
-    setSwapDirection(nextDirection);
+  // const handleSwap = () => {
+  //   const nextDirection = swapDirection === 0 ? 1 : 0;
+  //   setSwapDirection(nextDirection);
 
-    Animated.timing(swapRotation, {
-      toValue: nextDirection,
-      duration: 320,
-      useNativeDriver: true,
-    }).start();
-    const tmp = fromStation;
-    setFromStation(toStation);
-    setToStation(tmp);
-  };
+  //   Animated.timing(swapRotation, {
+  //     toValue: nextDirection,
+  //     duration: 320,
+  //     useNativeDriver: true,
+  //   }).start();
+  //   const tmp = fromStation;
+  //   setFromStation(toStation);
+  //   setToStation(tmp);
+  // };
 
   const spin = swapRotation.interpolate({
     inputRange: [0, 1],
@@ -196,7 +208,8 @@ export default function RailTrackerHome() {
             </View>
 
             {/* Swap control sits on the seam between the two fields */}
-            <View style={styles.swapSeam}>
+            {/* For sometime we stops the swap functionality*/}
+            {/* <View style={styles.swapSeam}>
               <View style={styles.seamLine} />
               <Pressable onPress={handleSwap} style={styles.swapButton}>
                 <Animated.View style={{ transform: [{ rotate: spin }] }}>
@@ -208,7 +221,7 @@ export default function RailTrackerHome() {
                 </Animated.View>
               </Pressable>
               <View style={styles.seamLine} />
-            </View>
+            </View> */}
 
             <View style={styles.fieldGroup}>
               <Text style={styles.fieldLabel}>TO</Text>
@@ -227,6 +240,7 @@ export default function RailTrackerHome() {
             </View>
 
             <Pressable
+              onPress={()=>getTrainList(fromStation.toLocaleUpperCase().trim(),toStation.toLocaleUpperCase().trim())}
               style={({ pressed }) => [
                 styles.searchCta,
                 pressed && { opacity: 0.9 },
@@ -292,226 +306,3 @@ export default function RailTrackerHome() {
   );
 }
 
-// ─── Styles ─────────────────────────────────────────────────────────────────
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.navyDeep },
-  body: { flex: 1, backgroundColor: colors.navyDeep },
-
-  header: {
-    paddingTop: 8,
-    paddingBottom: 22,
-    paddingHorizontal: 20,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
-  },
-  headerTopRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 22,
-  },
-  eyebrow: {
-    color: colors.brass,
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 2.2,
-    marginBottom: 4,
-  },
-  title: {
-    color: colors.ivory,
-    fontSize: 30,
-    fontWeight: "800",
-    letterSpacing: 1.2,
-  },
-  greeting: {
-    color: colors.slate,
-    fontSize: 13,
-    marginTop: 4,
-  },
-  bellWrap: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: "rgba(255,255,255,0.08)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 4,
-  },
-  bellDot: {
-    position: "absolute",
-    top: 8,
-    right: 9,
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: colors.brass,
-    borderWidth: 1,
-    borderColor: colors.navyDeep,
-  },
-
-  tabRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  tabItem: {
-    flex: 1,
-    alignItems: "center",
-    paddingVertical: 10,
-    marginHorizontal: 4,
-    borderRadius: 16,
-  },
-  tabItemActive: {
-    backgroundColor: "rgba(255,255,255,0.06)",
-  },
-  tabIconWrap: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: "rgba(255,255,255,0.08)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 6,
-  },
-  tabIconWrapActive: {
-    backgroundColor: colors.brass,
-  },
-  tabLabel: {
-    color: colors.slate,
-    fontSize: 11,
-    fontWeight: "600",
-    textAlign: "center",
-    lineHeight: 14,
-  },
-  tabLabelActive: {
-    color: colors.ivory,
-  },
-
-  journeyCard: {
-    marginTop: 22,
-    marginHorizontal: 20,
-    backgroundColor: colors.navyPanel,
-    borderRadius: 20,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.hairline,
-  },
-  fieldGroup: { marginBottom: 2 },
-  fieldLabel: {
-    color: colors.slate,
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 1.4,
-    marginBottom: 8,
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.navyPanelAlt,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    height: 52,
-  },
-  inputIconDot: {
-    width: 22,
-    alignItems: "center",
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    color: colors.ivory,
-    fontSize: 15,
-  },
-
-  swapSeam: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 12,
-  },
-  seamLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.hairline,
-  },
-  swapButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.crimson,
-    alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 10,
-    shadowColor: colors.crimson,
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 4,
-  },
-
-  searchCta: {
-    marginTop: 18,
-    borderRadius: 14,
-    overflow: "hidden",
-  },
-  searchCtaGradient: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 15,
-    gap: 8,
-  },
-  searchCtaText: {
-    color: colors.ivory,
-    fontSize: 15,
-    fontWeight: "700",
-    letterSpacing: 0.4,
-  },
-
-  sectionHeaderRow: {
-    marginTop: 28,
-    marginBottom: 14,
-    paddingHorizontal: 20,
-  },
-  sectionTitle: {
-    color: colors.ivory,
-    fontSize: 13,
-    fontWeight: "800",
-    letterSpacing: 1.6,
-    marginBottom: 6,
-  },
-  sectionRule: {
-    width: 34,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: colors.brass,
-  },
-
-  recentCard: {
-    width: 210,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.navyPanel,
-    borderRadius: 16,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: colors.hairline,
-  },
-  recentIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: colors.navyPanelAlt,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 10,
-  },
-  recentRoute: {
-    color: colors.ivory,
-    fontSize: 14,
-    fontWeight: "700",
-  },
-  recentDate: {
-    color: colors.slate,
-    fontSize: 11,
-    marginTop: 2,
-  },
-});
