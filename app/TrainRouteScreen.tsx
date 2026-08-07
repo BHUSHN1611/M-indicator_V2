@@ -1,14 +1,13 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import TrainSchedule from '@/components/TrainSchedule'
-import { useLocalSearchParams } from 'expo-router'
-import InfoCardHeader from "@/components/InfoCardHeader"
+﻿import InfoCardHeader from "@/components/InfoCardHeader";
+import TrainSchedule from "@/components/TrainSchedule";
+import { getLiveStatus, getTrainByNumber } from "@/utils/trains";
+import { useLocalSearchParams } from "expo-router";
+import React from "react";
+import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getTrainByNumber, getLiveStatus } from "@/utils/trains"; // adjust path
 
 const TrainRouteScreen = () => {
   const { train_no } = useLocalSearchParams<{ train_no: string }>();
-
   const train = train_no ? getTrainByNumber(train_no) : undefined;
 
   if (!train) {
@@ -27,14 +26,10 @@ const TrainRouteScreen = () => {
     );
   }
 
-  // Single source of truth for "is this train currently running" — shared
-  // with TrainSchedule's own internal ticking state via @/utils/trains, so
-  // the header badge can never drift out of sync with the timeline below it.
   const isLive = getLiveStatus(train.stops).status === "running";
 
   return (
     <SafeAreaView className="flex-1 bg-neutral-900">
-      {/* <Text className='text-white'>M_indicator Version-2</Text> */}
       <InfoCardHeader
         route={train.route}
         type={train.train_type}
@@ -53,4 +48,4 @@ const TrainRouteScreen = () => {
   );
 };
 
-export default TrainRouteScreen
+export default TrainRouteScreen;

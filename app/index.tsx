@@ -2,7 +2,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
-import { Router } from "expo-router";
+// import { Router } from "expo-router";
 import {
   Animated,
   Pressable,
