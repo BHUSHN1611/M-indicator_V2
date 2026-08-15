@@ -20,6 +20,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
+      // "package": "com.anonymous.Mindicator_V2"
     },
     "web": {
       "output": "static",
@@ -38,7 +39,14 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow this app to use your location while you are using the app."
+        }
       ]
+      
     ],
     "experiments": {
       "typedRoutes": true,

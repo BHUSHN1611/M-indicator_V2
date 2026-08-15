@@ -45,17 +45,7 @@ const TABS = [
   { id: "map", label: "Map", icon: "map-outline", lib: "ION" },
 ];
 
-function TabIcon({
-  lib,
-  name,
-  size,
-  color,
-}: {
-  lib: string;
-  name: any;
-  size: number;
-  color: string;
-}) {
+function TabIcon({lib,name,size,color,}: {lib: string;name: any;size: number;color: string;}) {
   return lib === "MCI" ? (
     <MaterialCommunityIcons name={name} size={size} color={color} />
   ) : (
@@ -86,11 +76,14 @@ export default function RailTrackerHome() {
 
   const handleTabPress = (tabId: string) => {
     if (tabId === "schedule") {
-      setActiveTab("search");
+      // setActiveTab("search");
       router.push("/AllTrainListScreen");
       return;
     }
-
+    if(tabId === "live"){
+      router.push("/gps-test");
+      return;
+    }
     setActiveTab(tabId);
   };
 
