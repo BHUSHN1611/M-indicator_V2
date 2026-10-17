@@ -2,7 +2,6 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
-import { Router } from "expo-router";
 import {
   Animated,
   Pressable,
@@ -16,21 +15,37 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "@/constants/colors";
 import { styles } from "@/theme_styles";
-import {AllstopsData} from "@/constants/Stationdata[Virar-Dahanu]"
+import { AllstopsData } from "@/constants/Stationdata[Virar-Dahanu]";
+import { stationRepository } from "@/src/core/data/stations";
+import { routeRepository } from "@/src/core/data/routes";
 
 // ─── Design tokens ──────────────────────────────────────────────────────────
 // Palette pulled from the signal lamps & brass fittings of a station platform,
 // not a generic "dark mode" default.
 
-function getTrainList(source:string,destination:string){
-  const AllStops = AllstopsData
+function getTrainList(source: string, destination: string) {
+  const from = stationRepository.findByName(source);
+  const to = stationRepository.findByName(destination);
 
+  if (from && to) {
+    router.push({
+      pathname: "/AllTrainListScreen",
+      params: { from: from.name, to: to.name },
+    });
+    return;
+  }
+
+  const AllStops = AllstopsData;
   for (let index = 0; index < AllStops.length; index++) {
-    if(AllStops[index]['Station']===source && AllStops[index]["Can_go"].includes(destination)){
-      router.push("/AllTrainListScreen")
+    if (AllStops[index]['Station'] === source && AllStops[index]["Can_go"].includes(destination)) {
+      router.push({
+        pathname: "/AllTrainListScreen",
+        params: { from: source, to: destination },
+      });
+      return;
     } 
   }
-  console.log("Error",source,destination)
+  router.push("/AllTrainListScreen");
 }
 const RECENT_SEARCHES = [
   { id: "1", from: "Virar", to: "Dahanu", date: "05 Jul 2026" },
@@ -87,19 +102,19 @@ export default function RailTrackerHome() {
     setActiveTab(tabId);
   };
 
-  // const handleSwap = () => {
-  //   const nextDirection = swapDirection === 0 ? 1 : 0;
-  //   setSwapDirection(nextDirection);
+  const handleSwap = () => {
+    const nextDirection = swapDirection === 0 ? 1 : 0;
+    setSwapDirection(nextDirection);
 
-  //   Animated.timing(swapRotation, {
-  //     toValue: nextDirection,
-  //     duration: 320,
-  //     useNativeDriver: true,
-  //   }).start();
-  //   const tmp = fromStation;
-  //   setFromStation(toStation);
-  //   setToStation(tmp);
-  // };
+    Animated.timing(swapRotation, {
+      toValue: nextDirection,
+      duration: 320,
+      useNativeDriver: true,
+    }).start();
+    const tmp = fromStation;
+    setFromStation(toStation);
+    setToStation(tmp);
+  };
 
   const spin = swapRotation.interpolate({
     inputRange: [0, 1],
@@ -201,8 +216,7 @@ export default function RailTrackerHome() {
             </View>
 
             {/* Swap control sits on the seam between the two fields */}
-            {/* For sometime we stops the swap functionality*/}
-            {/* <View style={styles.swapSeam}>
+            <View style={styles.swapSeam}>
               <View style={styles.seamLine} />
               <Pressable onPress={handleSwap} style={styles.swapButton}>
                 <Animated.View style={{ transform: [{ rotate: spin }] }}>
@@ -214,7 +228,7 @@ export default function RailTrackerHome() {
                 </Animated.View>
               </Pressable>
               <View style={styles.seamLine} />
-            </View> */}
+            </View>
 
             <View style={styles.fieldGroup}>
               <Text style={styles.fieldLabel}>TO</Text>
@@ -269,6 +283,11 @@ export default function RailTrackerHome() {
             {RECENT_SEARCHES.map((item) => (
               <Pressable
                 key={item.id}
+                onPress={() => {
+                  setFromStation(item.from);
+                  setToStation(item.to);
+                  getTrainList(item.from, item.to);
+                }}
                 style={({ pressed }) => [
                   styles.recentCard,
                   pressed && { opacity: 0.85 },

@@ -1,15 +1,18 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import TrainSchedule from '@/components/TrainSchedule'
-import { useLocalSearchParams } from 'expo-router'
-import InfoCardHeader from "@/components/InfoCardHeader"
-import { SafeAreaView } from "react-native-safe-area-context";
-import { getTrainByNumber, getLiveStatus } from "@/utils/trains"; // adjust path
+import { View, Text } from 'react-native';
+import React from 'react';
+import TrainSchedule from '@/components/TrainSchedule';
+import { useLocalSearchParams } from 'expo-router';
+import InfoCardHeader from '@/components/InfoCardHeader';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { getTrainByNumber } from '@/utils/trains';
+import { useTrainSchedule } from '@/src/hooks/useTrainSchedule';
 
 const TrainRouteScreen = () => {
   const { train_no } = useLocalSearchParams<{ train_no: string }>();
+  const trainNumber = train_no ?? '';
 
-  const train = train_no ? getTrainByNumber(train_no) : undefined;
+  const { tracking } = useTrainSchedule(trainNumber);
+  const train = trainNumber ? getTrainByNumber(trainNumber) : undefined;
 
   if (!train) {
     return (
@@ -27,18 +30,15 @@ const TrainRouteScreen = () => {
     );
   }
 
-  // Single source of truth for "is this train currently running" — shared
-  // with TrainSchedule's own internal ticking state via @/utils/trains, so
-  // the header badge can never drift out of sync with the timeline below it.
-  const isLive = getLiveStatus(train.stops).status === "running";
+  // Reactive live status driven by useTrainSchedule
+  const isLive = tracking?.isLive ?? false;
 
   return (
     <SafeAreaView className="flex-1 bg-neutral-900">
-      {/* <Text className='text-white'>M_indicator Version-2</Text> */}
       <InfoCardHeader
         route={train.route}
         type={train.train_type}
-        time={train.stops[0]?.time ?? ""}
+        time={train.stops[0]?.time ?? ''}
         trainNumber={train.train_no}
         isLive={isLive}
       />
@@ -46,11 +46,12 @@ const TrainRouteScreen = () => {
         route={train.route}
         trainNumber={train.train_no}
         type={train.train_type}
-        time={train.stops[0]?.time ?? ""}
+        time={train.stops[0]?.time ?? ''}
         stops={train.stops}
+        tracking={tracking}
       />
     </SafeAreaView>
   );
 };
 
-export default TrainRouteScreen
+export default TrainRouteScreen;

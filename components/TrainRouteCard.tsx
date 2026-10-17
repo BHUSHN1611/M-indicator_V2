@@ -1,21 +1,20 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import { useLocalSearchParams } from 'expo-router'
+import React from 'react';
+import { View, Text } from 'react-native';
 
-const {train_no} = useLocalSearchParams<{
-    train_no:string
-}>();
-
-interface TrainInfoCardProps {
-    train_no:string
+interface TrainRouteCardProps {
+  trainNumber?: string;
+  route?: string;
 }
 
-const TrainRouteCard = ({train_no}:TrainInfoCardProps) => {
+const TrainRouteCard: React.FC<TrainRouteCardProps> = ({ trainNumber, route }) => {
   return (
-    <View>
-      <Text className='mt-10 text-2xl text-amber-50'>hhh{train_no}</Text>
+    <View className="p-4 bg-neutral-900 rounded-lg">
+      <Text className="text-xl font-bold text-amber-50">
+        {trainNumber ? `Train #${trainNumber}` : 'Train Info'}
+      </Text>
+      {route && <Text className="text-sm text-neutral-400 mt-1">{route}</Text>}
     </View>
-  )
-}
+  );
+};
 
-export default TrainRouteCard
+export default TrainRouteCard;

@@ -1,4 +1,7 @@
 import { ALL_DN_TRAINS } from "@/constants/Trainstops[Virar-dahahu]"; 
+import { trainRepository } from "@/src/core/data/trains";
+import { stationRepository } from "@/src/core/data/stations";
+
 export interface Stop {
   time: string | null;
   departure?: string | null;
@@ -27,6 +30,25 @@ export interface TrainState {
 }
 
 export function getTrainByNumber(trainNo: string): TrainData | undefined {
+  const normTrain = trainRepository.getByNumber(trainNo);
+  if (normTrain) {
+    return {
+      train_no: normTrain.trainNumber,
+      route: normTrain.routeLabel,
+      train_type: normTrain.trainType,
+      cars: normTrain.cars,
+      stops: normTrain.stops.map((s) => ({
+        time: s.time,
+        departure: s.departureTime,
+        name: stationRepository.getById(s.stationId)?.name.toUpperCase() ?? s.stationId,
+        platform: s.platform,
+        major: s.isMajor,
+        endpoint: s.isEndpoint,
+        highlighted: s.isHighlighted,
+      })),
+    };
+  }
+
   return Object.values(ALL_DN_TRAINS).find((t) => t.train_no === trainNo);
 }
 

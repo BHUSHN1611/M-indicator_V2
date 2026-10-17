@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Animated, LayoutChangeEvent } from "react-nativ
 import { LinearGradient } from "expo-linear-gradient"; 
 import type { Stop } from "@/utils/trains";
 import { toMins, realNowMins, interpolateStopMins, getTrainState } from "@/utils/trains";
+import type { TrackingResult } from "@/src/core/models/tracking";
 
 interface TrainScheduleProps {
   route: string;
@@ -11,6 +12,7 @@ interface TrainScheduleProps {
   time: string;
   stops: Stop[];
   demoMode?: boolean;
+  tracking?: TrackingResult | null;
 }
 
 interface TrainMarkerProps {
@@ -290,13 +292,14 @@ function ProgressBar({ progress, firstName, lastName }: ProgressBarProps) {
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 
-export default function TrainRouteCard({
+export default function TrainSchedule({
   route,
   trainNumber,
   type,
   stops,
   time,
   demoMode = false,
+  tracking,
 }: TrainScheduleProps) {
   const scrollRef = useRef<ScrollView>(null);
   const demoRef = useRef<number | null>(null);
@@ -311,8 +314,9 @@ export default function TrainRouteCard({
     demoMode && hasStops ? (demoRef.current as number) : realNowMins()
   );
 
+  // Only run internal timer if external tracking is not provided
   useEffect(() => {
-    if (!hasStops) return;
+    if (!hasStops || tracking !== undefined) return;
     const interval = setInterval(() => {
       if (demoMode) {
         const last = toMins(stops[stops.length - 1].time);
@@ -327,7 +331,7 @@ export default function TrainRouteCard({
       }
     }, demoMode ? 2000 : 15000);
     return () => clearInterval(interval);
-  }, [demoMode, stops, hasStops]);
+  }, [demoMode, stops, hasStops, tracking]);
 
   if (!hasStops) {
     return (
@@ -338,8 +342,16 @@ export default function TrainRouteCard({
   }
 
   const stopMins = interpolateStopMins(stops);
-  const state = getTrainState(nowMins, stopMins);
-  const isLive = state.status === "running";
+  const fallbackState = getTrainState(nowMins, stopMins);
+
+  const currentIdx = tracking ? tracking.currentIdx : fallbackState.currentIdx;
+  const nextIdx = tracking ? tracking.nextIdx : fallbackState.nextIdx;
+  const isLive = tracking ? tracking.isLive : fallbackState.status === "running";
+  const status = tracking ? tracking.status : fallbackState.status;
+  const progress = tracking ? tracking.progress : fallbackState.progress;
+  const currentEta = tracking
+    ? tracking.etaLabel
+    : (nextIdx < stops.length ? etaLabel(nowMins, stopMins, nextIdx) : "");
 
   return (
     <View className="w-full h-full max-w-lg bg-neutral-900  overflow-hidden">
@@ -351,8 +363,8 @@ export default function TrainRouteCard({
         showsVerticalScrollIndicator={false}
       >
         {stops.map((stop, i) => {
-          const isPast = i < state.currentIdx || (state.status === "done" && i < stops.length - 1);
-          const isCurrent = isLive && i === state.currentIdx;
+          const isPast = i < currentIdx || (status === "done" && i < stops.length - 1);
+          const isCurrent = isLive && i === currentIdx;
 
           return (
             <React.Fragment key={`${stop.name}-${i}`}>
@@ -364,10 +376,10 @@ export default function TrainRouteCard({
                 isPast={isPast}
                 scrollRef={scrollRef}
               />
-              {isLive && i === state.currentIdx && state.nextIdx < stops.length && (
+              {isLive && i === currentIdx && nextIdx >= 0 && nextIdx < stops.length && (
                 <TrainMarker
-                  nextName={stops[state.nextIdx].name}
-                  eta={etaLabel(nowMins, stopMins, state.nextIdx)}
+                  nextName={stops[nextIdx].name}
+                  eta={currentEta}
                 />
               )}
             </React.Fragment>
@@ -375,9 +387,9 @@ export default function TrainRouteCard({
         })}
       </ScrollView>
 
-      {state.status !== "before" && (
+      {status !== "before" && (
         <ProgressBar
-          progress={state.progress}
+          progress={progress}
           firstName={stops[0].name}
           lastName={stops[stops.length - 1].name}
         />
