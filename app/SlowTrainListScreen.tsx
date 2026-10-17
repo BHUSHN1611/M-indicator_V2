@@ -1,6 +1,6 @@
-import React from 'react';
-import AllTrainListScreen from './AllTrainListScreen';
+import React from "react";
+import { TrainListScreen } from "@/features/timetable";
 
 export default function SlowTrainListScreen() {
-  return <AllTrainListScreen initialFilter="SLOW" />;
+  return <TrainListScreen initialFilter="SLOW" />;
 }
