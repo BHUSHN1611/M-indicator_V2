@@ -1,5 +1,6 @@
-import "@/global.css";
+import "../global.css";
 import { Stack } from "expo-router";
+import { colors } from "@/theme";
 
 export default function RootLayout() {
   return (
@@ -7,7 +8,7 @@ export default function RootLayout() {
       screenOptions={{
         headerShown: false,
         animation: "none",
-        contentStyle: { backgroundColor: "#030a17" },
+        contentStyle: { backgroundColor: colors.backgroundRoot },
       }}
     />
   );

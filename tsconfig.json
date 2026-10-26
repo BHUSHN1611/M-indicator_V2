@@ -5,7 +5,10 @@
     "jsx": "react-native",
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
+      ],
+      "@assets/*": [
+        "./assets/*"
       ]
     }
   },
@@ -15,5 +18,5 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts"
-, "app/AllTrainListScreen.tsx"  ]
+  ]
 }
