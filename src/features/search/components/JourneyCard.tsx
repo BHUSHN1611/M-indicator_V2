@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,7 +23,7 @@ export const JourneyCard: React.FC<JourneyCardProps> = ({
   onSearch,
 }) => {
   const [swapDirection, setSwapDirection] = useState(0);
-  const swapRotation = useRef(new Animated.Value(0)).current;
+  const [swapRotation] = useState(() => new Animated.Value(0));
 
   const handleSwap = () => {
     const nextDirection = swapDirection === 0 ? 1 : 0;
@@ -38,10 +38,14 @@ export const JourneyCard: React.FC<JourneyCardProps> = ({
     onSwapStations();
   };
 
-  const spin = swapRotation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "180deg"],
-  });
+  const spin = useMemo(
+    () =>
+      swapRotation.interpolate({
+        inputRange: [0, 1],
+        outputRange: ["0deg", "180deg"],
+      }),
+    [swapRotation]
+  );
 
   return (
     <View style={styles.journeyCard}>

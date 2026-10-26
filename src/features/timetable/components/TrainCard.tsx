@@ -55,6 +55,7 @@ const TrainCard: React.FC<TrainCardProps> = ({
   );
 };
 
+export { TrainCard };
 export default TrainCard;
 
 
