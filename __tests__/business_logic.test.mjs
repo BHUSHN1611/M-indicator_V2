@@ -214,3 +214,95 @@ describe('3. Route Matching & Stop Sequencing', () => {
     }
   });
 });
+
+describe('4. GPS Geolocation, Station Proximity & Track Corridor Matching', () => {
+  // Haversine distance formula
+  function distanceBetweenPoints(a, b) {
+    const R = 6371000;
+    const lat1 = (a.lat * Math.PI) / 180;
+    const lat2 = (b.lat * Math.PI) / 180;
+    const deltaLat = ((b.lat - a.lat) * Math.PI) / 180;
+    const deltaLng = ((b.lng - a.lng) * Math.PI) / 180;
+    const x =
+      Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+      Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLng / 2) * Math.sin(deltaLng / 2);
+    const y = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+    return R * y;
+  }
+
+  function projectPointOntoSegment(point, start, end) {
+    const dx = end.lng - start.lng;
+    const dy = end.lat - start.lat;
+    const lengthSquared = dx * dx + dy * dy;
+    if (lengthSquared === 0) {
+      return {
+        lat: start.lat,
+        lng: start.lng,
+        ratio: 0,
+        distanceFromLine: distanceBetweenPoints(point, start),
+      };
+    }
+    let ratio = ((point.lng - start.lng) * dx + (point.lat - start.lat) * dy) / lengthSquared;
+    ratio = Math.max(0, Math.min(1, ratio));
+    const projected = {
+      lat: start.lat + ratio * dy,
+      lng: start.lng + ratio * dx,
+    };
+    return {
+      lat: projected.lat,
+      lng: projected.lng,
+      ratio,
+      distanceFromLine: distanceBetweenPoints(point, projected),
+    };
+  }
+
+  const virar = { lat: 19.4553059, lng: 72.811816, name: 'Virar', code: 'VR' };
+  const vaitarna = { lat: 19.5186517, lng: 72.8499772, name: 'Vaitarna', code: 'VTN' };
+  const palghar = { lat: 19.6978882, lng: 72.7718888, name: 'Palghar', code: 'PLG' };
+
+  it('accurately calculates Haversine distance between Virar and Vaitarna stations', () => {
+    const dist = distanceBetweenPoints(virar, vaitarna);
+    // Aerial distance is approx 8.1 - 8.2 km
+    assert.ok(dist > 7500 && dist < 9000, `Expected ~8km, got ${dist}m`);
+  });
+
+  it('identifies nearest station when user is on station platform', () => {
+    // 30 meters from Virar station
+    const userAtVirar = { lat: 19.4554, lng: 72.8119 };
+    const stations = [virar, vaitarna, palghar];
+    let nearest = null;
+    let minDist = Infinity;
+    for (const s of stations) {
+      const d = distanceBetweenPoints(userAtVirar, s);
+      if (d < minDist) {
+        minDist = d;
+        nearest = s;
+      }
+    }
+    assert.equal(nearest.code, 'VR');
+    assert.ok(minDist < 50, `Distance should be under 50m, got ${minDist}m`);
+  });
+
+  it('projects coordinate onto track segment and calculates progress ratio', () => {
+    // Midpoint between Virar and Vaitarna
+    const midPoint = {
+      lat: (virar.lat + vaitarna.lat) / 2,
+      lng: (virar.lng + vaitarna.lng) / 2,
+    };
+    const projection = projectPointOntoSegment(midPoint, virar, vaitarna);
+    assert.ok(Math.abs(projection.ratio - 0.5) < 0.05, `Expected ratio ~0.5, got ${projection.ratio}`);
+    assert.ok(projection.distanceFromLine < 5, `Expected on-track distance < 5m, got ${projection.distanceFromLine}`);
+  });
+
+  it('detects off-route or implausible coordinates for crowdsourced filtering', () => {
+    // Coordinates in Mumbai downtown / Churchgate (~55 km south of Virar)
+    const southMumbai = { lat: 18.9322, lng: 72.8264 };
+    const projection = projectPointOntoSegment(southMumbai, virar, vaitarna);
+    // Distance from the Virar-Vaitarna corridor must be > 50km
+    assert.ok(
+      projection.distanceFromLine > 50000,
+      `Expected off-corridor distance > 50km, got ${projection.distanceFromLine}`
+    );
+  });
+});
+
