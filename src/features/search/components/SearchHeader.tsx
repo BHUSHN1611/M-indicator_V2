@@ -5,7 +5,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { colors, styles } from "@/theme";
 import { getGreeting } from "@/i18n";
 import { APP_TABS } from "@/constants";
-import { NavTabItem } from "../types";
 
 interface SearchHeaderProps {
   activeTab: string;

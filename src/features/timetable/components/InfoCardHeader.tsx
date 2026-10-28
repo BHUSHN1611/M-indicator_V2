@@ -59,4 +59,5 @@ const ScheduleHeader: React.FC<ScheduleHeaderProps> = ({route,trainNumber,type,t
   );
 };
 
+export { ScheduleHeader, ScheduleHeader as InfoCardHeader };
 export default ScheduleHeader;

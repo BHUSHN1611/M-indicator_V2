@@ -1,10 +1,10 @@
 export * from './types';
 export * from './hooks/useTrainList';
 export * from './hooks/useTrainSchedule';
-export * from './components/TrainCard';
-export * from './components/TrainFilter';
-export * from './components/InfoCardHeader';
-export * from './components/TrainSchedule';
+export { TrainCard } from './components/TrainCard';
+export { TrainFilter } from './components/TrainFilter';
+export { InfoCardHeader } from './components/InfoCardHeader';
+export { TrainSchedule } from './components/TrainSchedule';
 export * from './screens/TrainListScreen';
 export * from './screens/TrainRouteDetailScreen';
 export * from './utils/trains';

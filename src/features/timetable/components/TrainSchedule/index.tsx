@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, type ScrollViewInstance } from "react-native";
 import type { Stop } from "../../utils/trains";
 import { toMins, realNowMins, interpolateStopMins, getTrainState } from "../../utils/trains";
 import type { TrackingResult } from "@/types";
@@ -34,21 +34,26 @@ export function TrainSchedule({
   demoMode = false,
   tracking,
 }: TrainScheduleProps) {
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const demoRef = useRef<number | null>(null);
   const hasStops = !!stops && stops.length > 0;
 
-  if (demoMode && demoRef.current === null && hasStops) {
-    const firstMins = toMins(stops[0].time);
-    demoRef.current = typeof firstMins === "number" ? firstMins - 2 : 0;
-  }
+  const getInitialMins = () => {
+    if (demoMode && hasStops) {
+      const firstMins = toMins(stops[0].time);
+      return typeof firstMins === "number" ? firstMins - 2 : 0;
+    }
+    return realNowMins();
+  };
 
-  const [nowMins, setNowMins] = useState<number>(() =>
-    demoMode && hasStops ? (demoRef.current as number) : realNowMins()
-  );
+  const [nowMins, setNowMins] = useState<number>(getInitialMins);
 
   useEffect(() => {
     if (!hasStops || tracking !== undefined) return;
+    if (demoRef.current === null && demoMode) {
+      const firstMins = toMins(stops[0].time);
+      demoRef.current = typeof firstMins === "number" ? firstMins - 2 : 0;
+    }
     const interval = setInterval(() => {
       if (demoMode) {
         const last = toMins(stops[stops.length - 1].time);

@@ -34,11 +34,18 @@ export function useTrainSchedule(
 
   const demoVirtualMins = useRef<number | null>(null);
 
-  // Initial calculation
+  const lastSimulatedTrain = useRef<string>(trainNumber);
+
+  // Periodic calculation
   const calculateCurrent = useCallback(() => {
     if (!train) return null;
 
     if (demoMode) {
+      if (lastSimulatedTrain.current !== trainNumber) {
+        lastSimulatedTrain.current = trainNumber;
+        demoVirtualMins.current = null;
+      }
+
       const firstMins = timeStringToMinutes(train.stops[0]?.time) ?? 0;
       const lastMins = timeStringToMinutes(train.stops[train.stops.length - 1]?.time) ?? 1440;
 
@@ -59,9 +66,29 @@ export function useTrainSchedule(
     }
 
     return engine.calculate(train, route, new Date());
+  }, [train, route, engine, demoMode, trainNumber]);
+
+  const getInitialTracking = useCallback(() => {
+    if (!train) return null;
+    if (demoMode) {
+      const firstMins = timeStringToMinutes(train.stops[0]?.time) ?? 0;
+      const initialMins = firstMins - 2;
+      const virtualDate = new Date();
+      virtualDate.setHours(Math.floor(initialMins / 60));
+      virtualDate.setMinutes(Math.floor(initialMins % 60));
+      virtualDate.setSeconds(0);
+      return engine.calculate(train, route, virtualDate);
+    }
+    return engine.calculate(train, route, new Date());
   }, [train, route, engine, demoMode]);
 
-  const [tracking, setTracking] = useState<TrackingResult | null>(calculateCurrent);
+  const [tracking, setTracking] = useState<TrackingResult | null>(getInitialTracking);
+  const [prevTrainNumber, setPrevTrainNumber] = useState(trainNumber);
+
+  if (trainNumber !== prevTrainNumber) {
+    setPrevTrainNumber(trainNumber);
+    setTracking(getInitialTracking());
+  }
 
   // Recalculate helper
   const recalculate = useCallback(() => {
@@ -71,9 +98,6 @@ export function useTrainSchedule(
   // Interval ticker
   useEffect(() => {
     if (!train) return;
-
-    // Run immediate calculation when train changes
-    setTracking(calculateCurrent());
 
     const intervalId = setInterval(() => {
       setTracking(calculateCurrent());

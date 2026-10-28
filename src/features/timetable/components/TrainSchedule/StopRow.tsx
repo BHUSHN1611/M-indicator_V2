@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text, ScrollView, LayoutChangeEvent } from "react-native";
+import { View, Text, type ScrollViewInstance, LayoutChangeEvent } from "react-native";
 import { Stop } from "../../utils/trains";
 import { StopDot } from "./StopDot";
 
@@ -9,7 +9,7 @@ export interface StopRowProps {
   isLast: boolean;
   isCurrent: boolean;
   isPast: boolean;
-  scrollRef: React.RefObject<ScrollView | null>;
+  scrollRef: React.RefObject<ScrollViewInstance | null>;
 }
 
 export function StopRow({ stop, isFirst, isLast, isCurrent, isPast, scrollRef }: StopRowProps) {

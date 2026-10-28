@@ -12,7 +12,7 @@ interface TrainFilterProps {
   borderColorAll?: string;
 }
 
-export default function TrainFilter({
+export function TrainFilter({
   selectedFilter,
   onSelectFilter,
   borderColorFast,
@@ -103,3 +103,5 @@ export default function TrainFilter({
     </View>
   );
 }
+
+export default TrainFilter;
