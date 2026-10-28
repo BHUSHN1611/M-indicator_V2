@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, type ScrollViewInstance } from "react-native";
 import type { Stop } from "../../utils/trains";
 import { toMins, realNowMins, interpolateStopMins, getTrainState } from "../../utils/trains";
 import type { TrackingResult } from "@/types";
@@ -34,7 +34,7 @@ export function TrainSchedule({
   demoMode = false,
   tracking,
 }: TrainScheduleProps) {
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const demoRef = useRef<number | null>(null);
   const hasStops = !!stops && stops.length > 0;
 
